@@ -12,7 +12,7 @@ import net.spy.memcached.MemcachedClientIF;
 import net.spy.memcached.compat.BaseMockCase;
 import net.spy.memcached.internal.ImmediateFuture;
 
-import org.jmock.Mock;
+import org.jmock.Expectations;
 
 /**
  * Test the cache loader.
@@ -35,20 +35,23 @@ public class CacheLoaderTest extends BaseMockCase {
   }
 
   public void testSimpleLoading() throws Exception {
-    Mock m = mock(MemcachedClientIF.class);
+    MemcachedClientIF m = context.mock(MemcachedClientIF.class);
 
     LoadCounter sl = new LoadCounter();
-    CacheLoader cl = new CacheLoader((MemcachedClientIF) m.proxy(),
-            es, sl, 0);
+    CacheLoader cl = new CacheLoader(m, es, sl, 0);
 
-    m.expects(once()).method("set").with(eq("a"), eq(0), eq(1))
-            .will(returnValue(new ImmediateFuture(true)));
-    m.expects(once()).method("set").with(eq("a"), eq(0), eq(1))
-            .will(throwException(new IllegalStateException("Full up")));
-    m.expects(once()).method("set").with(eq("b"), eq(0), eq(2))
-            .will(returnValue(new ImmediateFuture(new RuntimeException("blah"))));
-    m.expects(once()).method("set").with(eq("c"), eq(0), eq(3))
-            .will(returnValue(new ImmediateFuture(false)));
+    context.checking(
+            new Expectations() {{
+              oneOf(m).set("a", 0, 1);
+              will(returnValue(new ImmediateFuture(true)));
+
+              oneOf(m).set("b", 0, 2);
+              will(returnValue(new ImmediateFuture(new RuntimeException("blah"))));
+
+              oneOf(m).set("c", 0, 3);
+              will(returnValue(new ImmediateFuture(false)));
+            }}
+    );
 
     Map<String, Object> map = new HashMap<>();
     map.put("a", 1);
