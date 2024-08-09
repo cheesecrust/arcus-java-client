@@ -2,14 +2,20 @@ package net.spy.memcached;
 
 import java.util.Iterator;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.junit.Test;
 
-public abstract class AbstractNodeLocationCase extends MockObjectTestCase {
+import org.jmock.Mockery;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public abstract class AbstractNodeLocationCase {
 
   protected MemcachedNode[] nodes;
-  protected Mock[] nodeMocks;
+  protected MemcachedNode[] nodeMocks;
   protected NodeLocator locator;
+  protected Mockery context;
 
   private void runSequenceAssertion(NodeLocator l, String k, int... seq) {
     int pos = 0;
@@ -24,25 +30,28 @@ public abstract class AbstractNodeLocationCase extends MockObjectTestCase {
       }
       pos++;
     }
-    assertEquals("Incorrect sequence size for " + k, seq.length, pos);
+    assertEquals(seq.length, pos, "Incorrect sequence size for " + k);
   }
 
+  @Test
   public final void testCloningGetPrimary() {
     setupNodes(5);
-    assertTrue(locator.getReadonlyCopy().getPrimary("hi")
-            instanceof MemcachedNodeROImpl);
+    assertInstanceOf(MemcachedNodeROImpl.class,
+            locator.getReadonlyCopy().getPrimary("hi"));
   }
 
+  @Test
   public final void testCloningGetAll() {
     setupNodes(5);
-    assertTrue(locator.getReadonlyCopy().getAll().iterator().next()
-            instanceof MemcachedNodeROImpl);
+    assertInstanceOf(MemcachedNodeROImpl.class,
+            locator.getReadonlyCopy().getAll().iterator().next());
   }
 
+  @Test
   public final void testCloningGetSequence() {
     setupNodes(5);
-    assertTrue(locator.getReadonlyCopy().getSequence("hi").next()
-            instanceof MemcachedNodeROImpl);
+    assertInstanceOf(MemcachedNodeROImpl.class,
+            locator.getReadonlyCopy().getSequence("hi").next());
   }
 
   protected final void assertSequence(String k, int... seq) {
@@ -52,11 +61,11 @@ public abstract class AbstractNodeLocationCase extends MockObjectTestCase {
 
   protected void setupNodes(int n) {
     nodes = new MemcachedNode[n];
-    nodeMocks = new Mock[nodes.length];
+    nodeMocks = new MemcachedNode[nodes.length];
 
     for (int i = 0; i < nodeMocks.length; i++) {
-      nodeMocks[i] = mock(MemcachedNode.class, "node#" + i);
-      nodes[i] = (MemcachedNode) nodeMocks[i].proxy();
+      nodeMocks[i] = context.mock(MemcachedNode.class, "node#" + i);
+      nodes[i] = nodeMocks[i];
     }
   }
 }

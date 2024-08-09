@@ -22,6 +22,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Test;
+
+import org.jmock.Expectations;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Test Arcus ketama node location.
  */
@@ -31,15 +39,20 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
   protected void setupNodes(int n) {
     super.setupNodes(n);
     for (int i = 0; i < nodeMocks.length; i++) {
-      nodeMocks[i].expects(atLeastOnce())
-              .method("getSocketAddress")
-              .will(returnValue(InetSocketAddress.createUnresolved(
-                      "127.0.0.1", 10000 + i)));
+      final int idx = i;
+
+      context.checking(
+              new Expectations() {{
+                atLeast(1).of(nodeMocks[idx]).getSocketAddress();
+                will(returnValue(InetSocketAddress.createUnresolved("127.0.0.1", 10000 + idx)));
+              }}
+      );
     }
 
     locator = new ArcusKetamaNodeLocator(Arrays.asList(nodes));
   }
 
+  @Test
   public void testAll() throws Exception {
     setupNodes(4);
 
@@ -50,6 +63,7 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
     }
   }
 
+  @Test
   public void testAllClone() throws Exception {
     setupNodes(4);
 
@@ -57,6 +71,7 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertEquals(4, all.size());
   }
 
+  @Test
   public void testLookups() {
     setupNodes(4);
     assertSame(nodes[0], locator.getPrimary("dustin"));
@@ -64,6 +79,7 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[0], locator.getPrimary("some other key"));
   }
 
+  @Test
   public void testLookupsClone() {
     setupNodes(4);
     assertSame(nodes[0].toString(),
@@ -74,6 +90,7 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
             locator.getReadonlyCopy().getPrimary("some other key").toString());
   }
 
+  @Test
   public void testContinuumWrapping() {
     setupNodes(4);
 
@@ -82,6 +99,7 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[3], locator.getPrimary("L9KH6X4X"));
   }
 
+  @Test
   public void testClusterResizing() {
     setupNodes(4);
     assertSame(nodes[0], locator.getPrimary("dustin"));
@@ -94,11 +112,13 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[4], locator.getPrimary("some other key"));
   }
 
+  @Test
   public void testSequence1() {
     setupNodes(4);
     assertSequence("dustin", 0, 2, 1, 2);
   }
 
+  @Test
   public void testSequence2() {
     setupNodes(4);
     assertSequence("noelani", 2, 1, 1, 3);
@@ -108,6 +128,7 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertSame(nodes[nid], locator.getPrimary(k));
   }
 
+  @Test
   public void testLibKetamaCompat() {
     setupNodes(5);
     assertPosForKey("36", 2);
@@ -116,20 +137,24 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
     assertPosForKey("49044", 4);
   }
 
-  private MemcachedNode[] mockNodes(String servers[]) {
+  private MemcachedNode[] mockNodes(String[] servers) {
     setupNodes(servers.length);
 
     for (int i = 0; i < nodeMocks.length; i++) {
+      final int idx = i;
       List<InetSocketAddress> a = AddrUtil.getAddresses(servers[i]);
 
-      nodeMocks[i].expects(atLeastOnce())
-              .method("getSocketAddress")
-              .will(returnValue(a.iterator().next()));
-
+      context.checking(
+              new Expectations() {{
+                atLeast(1).of(nodeMocks[idx]).getSocketAddress();
+                will(returnValue(a.iterator().next()));
+              }}
+      );
     }
     return nodes;
   }
 
+  @Test
   public void testLibKetamaCompatTwo() {
     String servers[] = {
       "10.0.1.1:11211",
@@ -3393,6 +3418,5 @@ public class ArcusKetamaNodeLocatorTest extends AbstractNodeLocationCase {
       MemcachedNode n = locator.getPrimary(k);
       assertEquals("/" + server, n.getSocketAddress().toString());
     }
-
   }
 }

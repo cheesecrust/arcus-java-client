@@ -20,9 +20,12 @@ import java.util.Arrays;
 
 import net.spy.memcached.compat.BaseMockCase;
 
+import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BTreeUtilTest extends BaseMockCase {
 
@@ -32,6 +35,7 @@ public class BTreeUtilTest extends BaseMockCase {
 
   }
 
+  @Test
   public void testFromByteArraysToHex() throws Exception {
     byte[] byteArray1 = {0, 'F', 'C', 0, 0};
     assertEquals("0x0046430000", BTreeUtil.toHex(byteArray1));
@@ -46,6 +50,7 @@ public class BTreeUtilTest extends BaseMockCase {
     assertEquals("0x000043410000", BTreeUtil.toHex(byteArray4));
   }
 
+  @Test
   public void testFromHexToByteArrays() throws Exception {
     byte[] byteArray1 = {0, 'F', 'C', 0, 0};
     assertTrue(Arrays.equals(byteArray1,
@@ -64,6 +69,7 @@ public class BTreeUtilTest extends BaseMockCase {
             BTreeUtil.hexStringToByteArrays("0x000043410000")));
   }
 
+  @Test
   public void testCompareSameLengthByteArrays() throws Exception {
     byte[] array1 = {0, 0, 1, 0};
     byte[] array2 = {0, 0, 0, 0};
@@ -74,6 +80,7 @@ public class BTreeUtilTest extends BaseMockCase {
     assertEquals(0, BTreeUtil.compareByteArraysInLexOrder(array1, array3));
   }
 
+  @Test
   public void testCompareDifferentLengthByteArrays() throws Exception {
     byte[] array1 = {0, 0, 1};
     byte[] array2 = {0, 0, 1, 0};
@@ -82,6 +89,7 @@ public class BTreeUtilTest extends BaseMockCase {
     assertEquals(1, BTreeUtil.compareByteArraysInLexOrder(array2, array1));
   }
 
+  @Test
   public void testInValidSizeBkey() {
     assertThrows(IllegalArgumentException.class, new ThrowingRunnable() {
       @Override
@@ -91,6 +99,7 @@ public class BTreeUtilTest extends BaseMockCase {
     });
   }
 
+  @Test
   public void testMinusLongBkey() {
     final long bkey = -1;
     assertThrows(IllegalArgumentException.class, new ThrowingRunnable() {
