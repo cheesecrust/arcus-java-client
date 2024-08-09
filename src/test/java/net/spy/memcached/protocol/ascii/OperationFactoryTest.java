@@ -5,6 +5,9 @@ import net.spy.memcached.OperationFactoryTestBase;
 import net.spy.memcached.ops.Mutator;
 import net.spy.memcached.ops.MutatorOperation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 public class OperationFactoryTest extends OperationFactoryTestBase {
 
   @Override
@@ -45,5 +48,4 @@ public class OperationFactoryTest extends OperationFactoryTestBase {
     assertSame(Mutator.decr, op2.getType());
     assertCallback(op2);
   }
-
 }

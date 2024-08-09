@@ -27,6 +27,8 @@ import java.util.List;
 
 import net.spy.memcached.compat.BaseMockCase;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
 /**
  * Test the basic operation buffer handling stuff.
  */
@@ -79,9 +81,9 @@ public class BaseOpTest extends BaseMockCase {
     op.setBytesToRead(2);
     op.readFromBuffer(ByteBuffer.wrap("xy".getBytes()));
     byte[] expected = {'x', 'y'};
-    assertTrue("Expected " + Arrays.toString(expected) + " but got "
-                    + Arrays.toString(op.getCurrentBytes()),
-            Arrays.equals(expected, op.getCurrentBytes()));
+    assertArrayEquals(expected, op.getCurrentBytes(),
+            "Expected " + Arrays.toString(expected) +
+                    " but got " + Arrays.toString(op.getCurrentBytes()));
   }
 
   public void testPartialLine() throws Exception {

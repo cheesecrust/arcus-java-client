@@ -76,7 +76,6 @@ public abstract class BaseTranscoderCase extends BaseMockCase {
     assertEquals(sb.toString(), sb2.toString());
   }
 
-
   private void assertFloat(float f) {
     assertEquals(f, tc.decode(tc.encode(f)));
   }

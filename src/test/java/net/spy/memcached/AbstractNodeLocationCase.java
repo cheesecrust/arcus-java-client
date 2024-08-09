@@ -2,14 +2,18 @@ package net.spy.memcached;
 
 import java.util.Iterator;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import junit.framework.TestCase;
 
-public abstract class AbstractNodeLocationCase extends MockObjectTestCase {
+import org.jmock.Mockery;
+
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
+public abstract class AbstractNodeLocationCase extends TestCase {
 
   protected MemcachedNode[] nodes;
-  protected Mock[] nodeMocks;
+  protected MemcachedNode[] nodeMocks;
   protected NodeLocator locator;
+  protected Mockery context;
 
   private void runSequenceAssertion(NodeLocator l, String k, int... seq) {
     int pos = 0;
@@ -29,20 +33,20 @@ public abstract class AbstractNodeLocationCase extends MockObjectTestCase {
 
   public final void testCloningGetPrimary() {
     setupNodes(5);
-    assertTrue(locator.getReadonlyCopy().getPrimary("hi")
-            instanceof MemcachedNodeROImpl);
+    assertInstanceOf(MemcachedNodeROImpl.class,
+            locator.getReadonlyCopy().getPrimary("hi"));
   }
 
   public final void testCloningGetAll() {
     setupNodes(5);
-    assertTrue(locator.getReadonlyCopy().getAll().iterator().next()
-            instanceof MemcachedNodeROImpl);
+    assertInstanceOf(MemcachedNodeROImpl.class,
+            locator.getReadonlyCopy().getAll().iterator().next());
   }
 
   public final void testCloningGetSequence() {
     setupNodes(5);
-    assertTrue(locator.getReadonlyCopy().getSequence("hi").next()
-            instanceof MemcachedNodeROImpl);
+    assertInstanceOf(MemcachedNodeROImpl.class,
+            locator.getReadonlyCopy().getSequence("hi").next());
   }
 
   protected final void assertSequence(String k, int... seq) {
@@ -52,11 +56,12 @@ public abstract class AbstractNodeLocationCase extends MockObjectTestCase {
 
   protected void setupNodes(int n) {
     nodes = new MemcachedNode[n];
-    nodeMocks = new Mock[nodes.length];
+    nodeMocks = new MemcachedNode[nodes.length];
+    context = new Mockery();
 
     for (int i = 0; i < nodeMocks.length; i++) {
-      nodeMocks[i] = mock(MemcachedNode.class, "node#" + i);
-      nodes[i] = (MemcachedNode) nodeMocks[i].proxy();
+      nodeMocks[i] = context.mock(MemcachedNode.class, "node#" + i);
+      nodes[i] = nodeMocks[i];
     }
   }
 }

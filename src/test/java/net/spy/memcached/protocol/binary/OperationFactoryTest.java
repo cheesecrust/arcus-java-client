@@ -3,6 +3,8 @@ package net.spy.memcached.protocol.binary;
 import net.spy.memcached.OperationFactory;
 import net.spy.memcached.OperationFactoryTestBase;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class OperationFactoryTest extends OperationFactoryTestBase {
 
   @Override

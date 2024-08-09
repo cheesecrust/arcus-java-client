@@ -7,6 +7,8 @@ import java.util.Calendar;
 
 import net.spy.memcached.CachedData;
 
+import org.junit.Before;
+
 /**
  * Test the serializing transcoder.
  */
@@ -15,8 +17,8 @@ public class WhalinTranscoderTest extends BaseTranscoderCase {
   private WhalinTranscoder tc;
   private TranscoderUtils tu;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() {
     super.setUp();
     tc = new WhalinTranscoder();
     setTranscoder(tc);

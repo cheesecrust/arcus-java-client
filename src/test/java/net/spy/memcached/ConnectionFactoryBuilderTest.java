@@ -37,6 +37,8 @@ import net.spy.memcached.protocol.binary.BinaryOperationFactory;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 import net.spy.memcached.transcoders.WhalinTranscoder;
 
+import org.junit.Before;
+
 /**
  * Test the connection factory builder.
  */
@@ -44,8 +46,8 @@ public class ConnectionFactoryBuilderTest extends BaseMockCase {
 
   private ConnectionFactoryBuilder b;
 
-  @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() {
     super.setUp();
     b = new ConnectionFactoryBuilder();
   }
