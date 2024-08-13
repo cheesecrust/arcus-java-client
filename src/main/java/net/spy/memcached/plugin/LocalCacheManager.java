@@ -16,6 +16,10 @@
  */
 package net.spy.memcached.plugin;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -24,51 +28,61 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.PersistenceConfiguration;
-import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
-
 import net.spy.memcached.compat.log.Logger;
 import net.spy.memcached.compat.log.LoggerFactory;
+
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.CacheConfiguration;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 
 /**
  * Local cache storage based on ehcache.
  */
 public class LocalCacheManager {
 
+  private static CacheManager cacheManager;
   private Logger logger = LoggerFactory.getLogger(getClass());
-
-  protected Cache cache;
+  protected Cache<String, Object> cache;
   protected String name;
+
+  private static CacheManager getCacheManager() {
+    if (cacheManager != null) {
+      return cacheManager;
+    }
+    
+    synchronized (CacheManager.class) {
+      if (cacheManager == null) {
+        cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);
+      }
+      return cacheManager;
+    }
+  }
 
   public LocalCacheManager(String name) {
     this.name = name;
     // create a undecorated Cache object.
-    this.cache = CacheManager.getInstance().getCache(name);
+    this.cache = getCacheManager().getCache(name, String.class, Object.class);
   }
 
-  public LocalCacheManager(String name, int max, int exptime, boolean copyOnRead,
-                           boolean copyOnWrite) {
-    this.cache = CacheManager.getInstance().getCache(name);
-    if (cache == null) {
-      CacheConfiguration config =
-              new CacheConfiguration(name, max)
-                      .copyOnRead(copyOnRead)
-                      .copyOnWrite(copyOnWrite)
-                      .memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LRU)
-                      .eternal(false)
-                      .timeToLiveSeconds(exptime)
-                      .timeToIdleSeconds(exptime)
-                      .diskExpiryThreadIntervalSeconds(60)
-                      .persistence(new PersistenceConfiguration().strategy(
-                          PersistenceConfiguration.Strategy.NONE));
-      this.cache = new Cache(config, null, null);
-      CacheManager.getInstance().addCache(cache);
+  public LocalCacheManager(String name, int max, int exptime) {
+    this.cache = getCacheManager().getCache(name, String.class, Object.class);
 
-      logger.info("Arcus k/v local cache is enabled : %s", cache.toString());
+    if (this.cache == null) {
+      CacheConfiguration<String, Object> config =
+              CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, Object.class,
+                      ResourcePoolsBuilder.heap(max))
+                      .withExpiry(ExpiryPolicyBuilder
+                              .timeToLiveExpiration(Duration.of(exptime, ChronoUnit.SECONDS)))
+                      .withExpiry(ExpiryPolicyBuilder
+                              .timeToIdleExpiration(Duration.of(exptime, ChronoUnit.SECONDS)))
+                      .build();
+      this.cache = getCacheManager().createCache(name, config);
+
+      logger.info("Arcus k/v local cache is enabled : ", cache.toString());
     }
   }
 
@@ -78,10 +92,10 @@ public class LocalCacheManager {
     }
 
     try {
-      Element element = cache.get(key);
-      if (null != element) {
+      Object value = cache.get(key);
+      if (null != value) {
         logger.debug("ArcusFrontCache: local cache hit for %s", key);
-        @SuppressWarnings("unchecked") T ret = (T) element.getObjectValue();
+        @SuppressWarnings("unchecked") T ret = (T) value;
         return ret;
       }
     } catch (Exception e) {
@@ -101,12 +115,12 @@ public class LocalCacheManager {
     return task;
   }
 
-  public Element getElement(String key) {
-    Element element = cache.get(key);
-    if (null != element) {
+  public Map.Entry<String, Object> getElement(String key) {
+    Object value = cache.get(key);
+    if (null != value) {
       logger.debug("ArcusFrontCache: local cache hit for %s", key);
     }
-    return element;
+    return new AbstractMap.SimpleEntry<>(key, value);
   }
 
   public <T> boolean put(String k, T v) {
@@ -115,7 +129,7 @@ public class LocalCacheManager {
     }
 
     try {
-      cache.put(new Element(k, v));
+      cache.put(k, v);
       return true;
     } catch (Exception e) {
       logger.info("failed to put to the local cache : %s", e.getMessage());
