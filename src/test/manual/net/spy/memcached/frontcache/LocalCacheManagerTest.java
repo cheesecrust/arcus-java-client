@@ -44,7 +44,7 @@ public class LocalCacheManagerTest extends TestCase {
   protected void setUp() throws Exception {
     super.setUp();
     ConnectionFactoryBuilder cfb = new ConnectionFactoryBuilder();
-    cfb.setFrontCacheExpireTime(5);
+    cfb.setFrontCacheExpireTime(3);
     cfb.setMaxFrontCacheElements(10);
     client = ArcusClient.createArcusClient("127.0.0.1:2181", "test", cfb);
   }
@@ -59,7 +59,7 @@ public class LocalCacheManagerTest extends TestCase {
 
   public void testGet() throws Exception {
     for (String k : keys) {
-      client.set(k, 2, k + "_value").get();
+      client.set(k, 1, k + "_value").get();
     }
 
     String key = keys.get(0);
@@ -73,8 +73,8 @@ public class LocalCacheManagerTest extends TestCase {
     assertNotNull(cached);
     assertSame("not the same result", result, cached);
 
-    // after 3 seconds : remote expired, locally cached
-    Thread.sleep(3000);
+    // after 2 seconds : remote expired, locally cached
+    Thread.sleep(2000);
 
     f = client.asyncGet(key);
     result = f.get();
@@ -85,8 +85,8 @@ public class LocalCacheManagerTest extends TestCase {
     assertNotNull(cached);
     assertEquals("not the same result", result, cached);
 
-    // after another 3 seconds : both remote and local expired
-    Thread.sleep(3000);
+    // after another 4 seconds : both remote and local expired
+    Thread.sleep(4000);
 
     f = client.asyncGet(key);
     result = f.get();
@@ -99,7 +99,7 @@ public class LocalCacheManagerTest extends TestCase {
 
   public void testGetBulk() throws Exception {
     for (String k : keys) {
-      client.set(k, 2, k + "_value").get();
+      client.set(k, 1, k + "_value").get();
     }
 
     // read-through.
@@ -112,17 +112,17 @@ public class LocalCacheManagerTest extends TestCase {
       assertNotNull(got);
     }
 
-    // after 3 seconds, all keys should be expired.
-    Thread.sleep(3000);
+    // after 2 seconds, all keys should be expired.
+    Thread.sleep(2000);
 
     // but we have locally cached results.
     result = client.getBulk(keys);
     assertNotNull(result);
     assertEquals(keys.size(), result.size());
 
-    // then after additional 3 seconds, locally cached results should be
+    // then after additional 4 seconds, locally cached results should be
     // expired.
-    Thread.sleep(3000);
+    Thread.sleep(4000);
 
     for (String k : keys) {
       Object got = lcm.get(k);
@@ -136,7 +136,7 @@ public class LocalCacheManagerTest extends TestCase {
 
   public void testAsyncGetBulk() throws Exception {
     for (String k : keys) {
-      client.set(k, 2, k + "_value").get();
+      client.set(k, 1, k + "_value").get();
     }
 
     // read-through.
@@ -150,8 +150,8 @@ public class LocalCacheManagerTest extends TestCase {
       assertNotNull(got);
     }
 
-    // after 3 seconds, all keys should be expired.
-    Thread.sleep(3000);
+    // after 2 seconds, all keys should be expired.
+    Thread.sleep(2000);
 
     // but we have locally cached results.
     f = client.asyncGetBulk(keys);
@@ -159,9 +159,9 @@ public class LocalCacheManagerTest extends TestCase {
     assertNotNull(result);
     assertEquals(keys.size(), result.size());
 
-    // then after additional 3 seconds, locally cached results should be
+    // then after additional 4 seconds, locally cached results should be
     // expired.
-    Thread.sleep(3000);
+    Thread.sleep(4000);
 
     for (String k : keys) {
       Object got = lcm.get(k);
@@ -185,7 +185,7 @@ public class LocalCacheManagerTest extends TestCase {
 
     // Set 1
     for (String k : keySet1) {
-      client.set(k, 2, k + "_value").get();
+      client.set(k, 1, k + "_value").get();
     }
 
     // read-through.
@@ -199,12 +199,12 @@ public class LocalCacheManagerTest extends TestCase {
       assertNotNull(got);
     }
 
-    // after 3 seconds, put another set of keys
-    Thread.sleep(3000);
+    // after 2 seconds, put another set of keys
+    Thread.sleep(2000);
 
     // Set 2
     for (String k : keySet2) {
-      client.set(k, 4, k + "_value").get();
+      client.set(k, 5, k + "_value").get();
     }
 
     // Set 1 : locally cached
@@ -214,9 +214,9 @@ public class LocalCacheManagerTest extends TestCase {
     assertNotNull(result);
     assertEquals(keys.size(), result.size());
 
-    // then after additional 3 seconds, locally cached Set 1 should be
+    // then after additional 4 seconds, locally cached Set 1 should be
     // expired.
-    Thread.sleep(3000);
+    Thread.sleep(4000);
 
     for (String k : keySet1) {
       Object got = lcm.get(k);
