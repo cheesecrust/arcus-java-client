@@ -70,15 +70,15 @@ public class CollectionDeleteOperationImpl extends OperationImpl
     this.key = key;
     this.collectionDelete = collectionDelete;
     if (this.collectionDelete instanceof ListDelete) {
-      setAPIType(APIType.LOP_DELETE);
+      this.apiType = APIType.LOP_DELETE;
     } else if (this.collectionDelete instanceof SetDelete) {
-      setAPIType(APIType.SOP_DELETE);
+      this.apiType = APIType.SOP_DELETE;
     } else if (this.collectionDelete instanceof MapDelete) {
-      setAPIType(APIType.MOP_DELETE);
+      this.apiType = APIType.MOP_DELETE;
     } else if (this.collectionDelete instanceof BTreeDelete) {
-      setAPIType(APIType.BOP_DELETE);
+      this.apiType = APIType.BOP_DELETE;
     }
-    setOperationType(OperationType.WRITE);
+    this.opType = OperationType.WRITE;
   }
 
   @Override

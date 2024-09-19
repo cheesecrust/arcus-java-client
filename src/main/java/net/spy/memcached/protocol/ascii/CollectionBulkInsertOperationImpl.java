@@ -73,15 +73,15 @@ public class CollectionBulkInsertOperationImpl extends OperationImpl
     this.insert = insert;
     this.cb = (Callback) cb;
     if (this.insert instanceof CollectionBulkInsert.ListBulkInsert) {
-      setAPIType(APIType.LOP_INSERT);
+      this.apiType = APIType.LOP_INSERT;
     } else if (this.insert instanceof CollectionBulkInsert.SetBulkInsert) {
-      setAPIType(APIType.SOP_INSERT);
+      this.apiType = APIType.SOP_INSERT;
     } else if (this.insert instanceof CollectionBulkInsert.MapBulkInsert) {
-      setAPIType(APIType.MOP_INSERT);
+      this.apiType = APIType.MOP_INSERT;
     } else if (this.insert instanceof CollectionBulkInsert.BTreeBulkInsert) {
-      setAPIType(APIType.BOP_INSERT);
+      this.apiType = APIType.BOP_INSERT;
     }
-    setOperationType(OperationType.WRITE);
+    this.opType = OperationType.WRITE;
   }
 
   @Override

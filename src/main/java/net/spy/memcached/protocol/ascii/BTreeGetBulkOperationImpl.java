@@ -79,8 +79,8 @@ public class BTreeGetBulkOperationImpl extends OperationImpl implements
   public BTreeGetBulkOperationImpl(BTreeGetBulk<?> getBulk, OperationCallback cb) {
     super(cb);
     this.getBulk = getBulk;
-    setAPIType(APIType.BOP_GET);
-    setOperationType(OperationType.READ);
+    this.apiType = APIType.BOP_GET;
+    this.opType = OperationType.READ;
   }
 
   public void handleLine(String line) {

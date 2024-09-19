@@ -60,8 +60,8 @@ public class BTreeFindPositionOperationImpl extends OperationImpl implements
     super(cb);
     this.key = key;
     this.get = get;
-    setAPIType(APIType.BOP_POSITION);
-    setOperationType(OperationType.READ);
+    this.apiType = APIType.BOP_POSITION;
+    this.opType = OperationType.READ;
   }
 
   @Override

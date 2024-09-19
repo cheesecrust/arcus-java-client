@@ -76,8 +76,8 @@ public class BTreeSortMergeGetOperationOldImpl extends OperationImpl implements
                                            OperationCallback cb) {
     super(cb);
     this.smGet = smGet;
-    setAPIType(APIType.BOP_SMGET);
-    setOperationType(OperationType.READ);
+    this.apiType = APIType.BOP_SMGET;
+    this.opType = OperationType.READ;
   }
 
   /**

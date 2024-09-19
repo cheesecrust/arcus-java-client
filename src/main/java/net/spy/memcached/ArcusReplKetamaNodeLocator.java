@@ -36,6 +36,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.spy.memcached.compat.SpyObject;
+import net.spy.memcached.compat.log.LoggerFactory;
 import net.spy.memcached.util.ArcusReplKetamaNodeLocatorConfiguration;
 
 public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator {
@@ -68,6 +69,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
     allNodes = nodes;
     ketamaGroups = new TreeMap<>();
     allGroups = new HashMap<>();
+    logger = LoggerFactory.getLogger(getClass());
 
     // create all memcached replica group
     for (MemcachedNode node : nodes) {
@@ -75,7 +77,7 @@ public class ArcusReplKetamaNodeLocator extends SpyObject implements NodeLocator
       mrg = allGroups.get(MemcachedReplicaGroup.getGroupNameFromNode(node));
       if (mrg == null) {
         mrg = new MemcachedReplicaGroupImpl(node);
-        getLogger().info("new memcached replica group added %s", mrg.getGroupName());
+        logger.info("new memcached replica group added %s", mrg.getGroupName());
         allGroups.put(mrg.getGroupName(), mrg);
       } else {
         mrg.setMemcachedNode(node);

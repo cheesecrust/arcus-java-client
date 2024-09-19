@@ -70,12 +70,12 @@ public class CollectionMutateOperationImpl extends OperationImpl implements
     this.collectionMutate = collectionMutate;
     if (this.collectionMutate instanceof BTreeMutate) {
       if (((BTreeMutate) this.collectionMutate).getMutator() == Mutator.incr) {
-        setAPIType(APIType.BOP_INCR);
+        this.apiType = APIType.BOP_INCR;
       } else {
-        setAPIType(APIType.BOP_DECR);
+        this.apiType = APIType.BOP_DECR;
       }
     }
-    setOperationType(OperationType.WRITE);
+    this.opType = OperationType.WRITE;
   }
 
   public void handleLine(String line) {

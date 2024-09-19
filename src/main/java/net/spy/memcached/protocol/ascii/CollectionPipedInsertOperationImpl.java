@@ -77,17 +77,17 @@ public class CollectionPipedInsertOperationImpl extends OperationImpl
     this.insert = insert;
     this.cb = (Callback) cb;
     if (this.insert instanceof CollectionPipedInsert.ListPipedInsert) {
-      setAPIType(APIType.LOP_INSERT);
+      this.apiType = APIType.LOP_INSERT;
     } else if (this.insert instanceof CollectionPipedInsert.SetPipedInsert) {
-      setAPIType(APIType.SOP_INSERT);
+      this.apiType = APIType.SOP_INSERT;
     } else if (this.insert instanceof CollectionPipedInsert.MapPipedInsert) {
-      setAPIType(APIType.MOP_INSERT);
+      this.apiType = APIType.MOP_INSERT;
     } else if (this.insert instanceof CollectionPipedInsert.BTreePipedInsert) {
-      setAPIType(APIType.BOP_INSERT);
+      this.apiType = APIType.BOP_INSERT;
     } else if (this.insert instanceof CollectionPipedInsert.ByteArraysBTreePipedInsert) {
-      setAPIType(APIType.BOP_INSERT);
+      this.apiType = APIType.BOP_INSERT;
     }
-    setOperationType(OperationType.WRITE);
+    this.opType = OperationType.WRITE;
   }
 
   @Override

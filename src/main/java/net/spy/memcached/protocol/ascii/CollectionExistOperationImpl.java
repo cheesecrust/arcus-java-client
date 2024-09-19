@@ -67,9 +67,9 @@ public class CollectionExistOperationImpl extends OperationImpl
     this.subkey = subkey;
     this.collectionExist = collectionExist;
     if (this.collectionExist instanceof SetExist) {
-      setAPIType(APIType.SOP_EXIST);
+      this.apiType = APIType.SOP_EXIST;
     }
-    setOperationType(OperationType.READ);
+    this.opType = OperationType.READ;
   }
 
   @Override

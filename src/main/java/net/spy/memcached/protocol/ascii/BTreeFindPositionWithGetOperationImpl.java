@@ -79,8 +79,8 @@ public class BTreeFindPositionWithGetOperationImpl extends OperationImpl impleme
     this.get = get;
     this.eHeadCount = get.getEHeadCount();
     this.eFlagIndex = get.getEFlagIndex();
-    setAPIType(APIType.BOP_PWG);
-    setOperationType(OperationType.READ);
+    this.apiType = APIType.BOP_PWG;
+    this.opType = OperationType.READ;
   }
 
   @Override

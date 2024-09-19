@@ -92,18 +92,18 @@ public class CollectionGetOperationImpl extends OperationImpl
     this.eHeadCount = collectionGet.getEHeadCount();
     this.eFlagIndex = collectionGet.getEFlagIndex();
     if (this.collectionGet instanceof ListGet) {
-      setAPIType(APIType.LOP_GET);
+      this.apiType = APIType.LOP_GET;
     } else if (this.collectionGet instanceof SetGet) {
-      setAPIType(APIType.SOP_GET);
+      this.apiType = APIType.SOP_GET;
     } else if (this.collectionGet instanceof MapGet) {
-      setAPIType(APIType.MOP_GET);
+      this.apiType = APIType.MOP_GET;
     } else if (this.collectionGet instanceof BTreeGet) {
-      setAPIType(APIType.BOP_GET);
+      this.apiType = APIType.BOP_GET;
     }
     if (collectionGet.isDelete()) {
-      setOperationType(OperationType.WRITE);
+      this.opType = OperationType.WRITE;
     } else {
-      setOperationType(OperationType.READ);
+      this.opType = OperationType.READ;
     }
   }
 

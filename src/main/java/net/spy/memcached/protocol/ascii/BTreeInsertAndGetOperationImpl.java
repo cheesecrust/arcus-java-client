@@ -103,11 +103,11 @@ public class BTreeInsertAndGetOperationImpl extends OperationImpl implements
     this.eFlagIndex = get.getEFlagIndex();
     this.dataToStore = dataToStore;
     if (get.isUpdateIfExist()) {
-      setAPIType(APIType.BOP_UPSERT);
+      this.apiType = APIType.BOP_UPSERT;
     } else {
-      setAPIType(APIType.BOP_INSERT);
+      this.apiType = APIType.BOP_INSERT;
     }
-    setOperationType(OperationType.WRITE);
+    this.opType = OperationType.WRITE;
   }
 
   @Override

@@ -55,8 +55,8 @@ public abstract class BaseOperationImpl extends SpyObject {
   protected OperationCallback callback = null;
   private volatile MemcachedNode handlingNode = null;
 
-  private OperationType opType = OperationType.UNDEFINED;
-  private APIType apiType = APIType.UNDEFINED;
+  protected OperationType opType = OperationType.UNDEFINED;
+  protected APIType apiType = APIType.UNDEFINED;
 
   /* ENABLE_MIGRATION if */
   private RedirectHandler redirectHandler = null;
